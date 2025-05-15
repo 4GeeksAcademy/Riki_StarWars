@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { getImageUrl } from "../utils/imageUtils";
 
 export const DetailView = () => {
     const { type, id } = useParams();
     const { store, dispatch } = useGlobalReducer();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [imgError, setImgError] = useState(false);
     const navigate = useNavigate();
+    
+    // URL de respaldo según el tipo
+    const fallbackImages = {
+        people: "https://via.placeholder.com/300/000000/FFFFFF?text=Character",
+        planets: "https://via.placeholder.com/300/003366/FFFFFF?text=Planet",
+        vehicles: "https://via.placeholder.com/300/660000/FFFFFF?text=Vehicle"
+    };
+    
+    // Genera la URL de la imagen basada en el tipo y el ID
+    const imageUrl = getImageUrl(type, id);
+    const fallbackUrl = fallbackImages[type] || "https://via.placeholder.com/300?text=Star+Wars";
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -31,8 +44,22 @@ export const DetailView = () => {
         if (isFavorite) {
             dispatch({ type: "REMOVE_FAVORITE", payload: id });
         } else {
-            dispatch({ type: "ADD_FAVORITE", payload: { id, name: data.name, type } });
+            // Incluye la imagen en el objeto de favorito
+            dispatch({ 
+                type: "ADD_FAVORITE", 
+                payload: { 
+                    id, 
+                    name: data.name, 
+                    type,
+                    img: imgError ? fallbackUrl : imageUrl 
+                } 
+            });
         }
+    };
+
+    const handleImageError = () => {
+        console.log("Error al cargar la imagen detallada:", data?.name);
+        setImgError(true);
     };
 
     return (
@@ -42,6 +69,14 @@ export const DetailView = () => {
                 <p className="loading-text">Cargando información...</p>
             ) : data ? (
                 <div className="details-card">
+                    {/* Añadir la imagen con manejo de errores */}
+                    <img 
+                        src={imgError ? fallbackUrl : imageUrl} 
+                        alt={data.name}
+                        className="details-image"
+                        onError={handleImageError}
+                    />
+                    
                     <h2 className="title">{data.name}</h2>
                     <button className="btn-favorite" onClick={toggleFavorite}>
                         {isFavorite ? "❤️" : "🤍"}
