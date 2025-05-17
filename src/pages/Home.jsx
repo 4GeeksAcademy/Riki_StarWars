@@ -18,6 +18,7 @@ export const Home = () => {
       if (!response.ok) throw new Error("Error al traer los planetas");
       const data = await response.json();
       setPlanets(data.results);
+      console.log (data.results)
       dispatch({ type: "SET_PLANETS", payload: data.results });
     } catch (error) {
       console.error("Error en getPlanets:", error);
@@ -30,6 +31,7 @@ export const Home = () => {
       if (!response.ok) throw new Error("Error al traer los vehículos");
       const data = await response.json();
       setVehicles(data.results);
+      console.log (data.results)
       dispatch({ type: "SET_VEHICLES", payload: data.results });
     } catch (error) {
       console.error("Error en getVehicles:", error);
@@ -42,6 +44,7 @@ export const Home = () => {
       if (!response.ok) throw new Error("Error al traer los personajes");
       const data = await response.json();
       setCharacters(data.results);
+      console.log (data.results)
       dispatch({ type: "SET_CHARACTERS", payload: data.results });
     } catch (error) {
       console.error("Error en getCharacters:", error);
